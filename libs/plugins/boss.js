@@ -31,7 +31,13 @@ module.exports = function (mod, lib) {
     dirty = false;
   const current = {};
   const pingHistory = [];
-  const pingMin = () => pingHistory.length ? Math.min(...pingHistory) : lib.ping.ping || 0;
+  const pingMin = () => {
+    const n = pingHistory.length;
+    if (!n) return lib.ping.ping || 0;
+    let m = pingHistory[0];
+    for (let i = 1; i < n; i++) if (pingHistory[i] < m) m = pingHistory[i];
+    return m;
+  };
   const sampler = mod.setInterval(() => {
     const p = lib.ping.ping || 0;
     if (!p) return;

@@ -87,13 +87,16 @@ class AutoTune {
     }
   }
   safetyMs() {
-    if (!this.cfg.enabled) return 0;
+    const a = this.mods.settings?.info?.auto;
+    if (!a || !a.enabled) return 0;
     this.advance();
     return Math.round(Math.max(this.pressure, this.floor));
   }
   pump(amount) {
+    if (!(amount > 0)) return;
+    const a = this.mods.settings?.info?.auto;
+    if (!a || !a.enabled) return;
     const cfg = this.cfg;
-    if (!cfg.enabled || !(amount > 0)) return;
     this.advance();
     this.lastEvent = Date.now();
     this.pressure = Math.min(cfg.maxMs, this.pressure + amount);
@@ -104,6 +107,8 @@ class AutoTune {
     }
   }
   hit(kind) {
+    const a = this.mods.settings?.info?.auto;
+    if (!a || !a.enabled) return;
     const weight = this.cfg.weights[kind] || 0;
     if (!weight) return;
     this.counts[kind] = (this.counts[kind] || 0) + 1;
