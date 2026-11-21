@@ -16,6 +16,11 @@ class Settings {
       spikeDecay: 0.6,
       spikeMargin: 4,
       spikeNotify: 40,
+      adaptiveRetry: false,
+      retryMaxExtra: 3,
+      retryLoadScale: 15,
+      adaptiveChain: false,
+      chainSmooth: 0.3,
       auto: {
         enabled: true,
         maxMs: 50,
@@ -59,7 +64,17 @@ class Settings {
     this.mods.command.add("delay", this.delay);
     this.mods.command.add("jaunt", this.jaunt);
     this.mods.command.add("instant", this.instant);
+    this.mods.command.add("aretry", this.aretry);
+    this.mods.command.add("achain", this.achain);
   }
+  aretry = () => {
+    this.info.adaptiveRetry = !this.info.adaptiveRetry;
+    this.mods.command.message("Adaptive retry has been turned", this.info.adaptiveRetry ? "on" : "off");
+  };
+  achain = () => {
+    this.info.adaptiveChain = !this.info.adaptiveChain;
+    this.mods.command.message("Adaptive chain smoothing has been turned", this.info.adaptiveChain ? "on" : "off");
+  };
   coerceNumber(value, fallback, min, max) {
     let n = typeof value === "number" ? value : parseFloat(value);
     if (!Number.isFinite(n)) n = fallback;
@@ -97,6 +112,11 @@ class Settings {
     num("spikeDecay", 0, 100);
     num("spikeMargin", 0, 100);
     num("spikeNotify", 0, 1000);
+    bool("adaptiveRetry");
+    bool("adaptiveChain");
+    num("retryMaxExtra", 0, 20);
+    num("retryLoadScale", 1, 1000);
+    num("chainSmooth", 0, 1);
     if (typeof info.auto !== "object" || info.auto === null) info.auto = {};
     const auto = info.auto,
       autoDef = def.auto;

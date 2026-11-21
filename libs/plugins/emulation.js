@@ -16,6 +16,7 @@ module.exports = function (v1, v2) {
   const startTs = Date.now(),
     rollWin = [],
     ROLL_MS = 300000;
+  let chainEma = 0;
   const SPIKE_CAP = () => v2.settings.info.spikeCap ?? 150,
     SPIKE_DECAY_PER_MS = () => v2.settings.info.spikeDecay ?? 0.6,
     SPIKE_MARGIN = () => v2.settings.info.spikeMargin ?? 4;
@@ -152,7 +153,7 @@ module.exports = function (v1, v2) {
       const mins = Math.round(n / 60);
       line = "\nSur " + (mins >= 1 ? mins + " min" : n + " s") + ": ping " + Math.round(pMin) + "/" + Math.round(pSum / n) + "/" + Math.round(pMax) + " (min/moy/max) | jitter " + Math.round(jMin) + "/" + Math.round(jSum / n) + "/" + Math.round(jMax) + "\n0-ping pur: " + Math.round(100 * zero / n) + "% du temps";
     }
-    v2.command.message("\nPing: " + Math.round(v2.ping.ping) + " ms | calme: " + Math.round(pingBase ?? 0) + " | jitter: " + Math.round(v2.ping.jitter) + "\nSpike buffer: " + Math.round(spikeHold) + " | Jitter pad: " + Math.round(jitterPad()) + " | Auto buffer: " + safety + " ms\nInstant: " + (v2.settings.info.instant ? "on" : "off") + " | delay manuel: " + (v2.settings.info.delay || 0) + " ms\nLatence ajoutee ~ " + effectiveBuffer() + " ms" + line + "\nUptime: " + fmtUptime(Date.now() - startTs) + " | fallbacks: " + (counts.fallbacks || 0) + "\nDesync: " + (counts.desync || 0) + " | stall: " + (counts.stall || 0) + " | loop: " + (counts.loop || 0) + " | rubber-band: " + (counts.rubberband || 0));
+    v2.command.message("\nPing: " + Math.round(v2.ping.ping) + " ms | calme: " + Math.round(pingBase ?? 0) + " | jitter: " + Math.round(v2.ping.jitter) + "\nSpike buffer: " + Math.round(spikeHold) + " | Jitter pad: " + Math.round(jitterPad()) + " | Auto buffer: " + safety + " ms\nInstant: " + (v2.settings.info.instant ? "on" : "off") + " | delay manuel: " + (v2.settings.info.delay || 0) + " ms\nLatence ajoutee ~ " + effectiveBuffer() + " ms" + line + "\nAdaptive retry: " + (v2.settings.info.adaptiveRetry ? "on" : "off") + " | adaptive chain: " + (v2.settings.info.adaptiveChain ? "on" : "off") + "\nUptime: " + fmtUptime(Date.now() - startTs) + " | fallbacks: " + (counts.fallbacks || 0) + "\nDesync: " + (counts.desync || 0) + " | stall: " + (counts.stall || 0) + " | loop: " + (counts.loop || 0) + " | rubber-band: " + (counts.rubberband || 0));
   });
   let telemetryTimer = null;
   const telemetryFile = nodePath.join(__dirname, "../../telemetry.csv");
@@ -327,8 +328,12 @@ module.exports = function (v1, v2) {
       const v69 = v2.skills.getActionStageDelay(v61);
       v1.clearTimeout(v8);
       if (v69) v8 = v1.setTimeout(v18, v69, v61, false, v67);else v18(v61, false, v67);
-      const v70 = v2.skills.getRetryCount(v61),
-        v71 = v2.hardcoded.getRetryDelay(v61),
+      let v70 = v2.skills.getRetryCount(v61);
+      if (v2.settings.info.adaptiveRetry) {
+        const retryLoad = Math.round(spikeHold) + (v2.auto ? v2.auto.safetyMs() : 0);
+        v70 += Math.min(v2.settings.info.retryMaxExtra ?? 3, Math.floor(retryLoad / (v2.settings.info.retryLoadScale ?? 15)));
+      }
+      const v71 = v2.hardcoded.getRetryDelay(v61),
         v72 = v2.hardcoded.getAllowThroughFutureRetry(v61),
         v73 = v2?.action?.serverStage?.id,
         v74 = v2?.action?.stage?.id,
@@ -404,6 +409,12 @@ module.exports = function (v1, v2) {
         const v90 = v89 + v88,
           v91 = v6.estimate + (v89 - v6.arrived);
         v88 = Math.max(v90, v91) - v89;
+      }
+      if (v2.settings.info.adaptiveChain) {
+        if (!v6.counter) chainEma = 0;
+        const alpha = v2.settings.info.chainSmooth ?? 0.3;
+        if (v6.counter && chainEma > 0) v88 = Math.round(v88 * (1 - alpha) + chainEma * alpha);
+        chainEma = chainEma > 0 ? Math.round(chainEma * (1 - alpha) + v88 * alpha) : v88;
       }
       v2.log.debug("SKILL_UPDATE", v83.skill.id + " ->", v86, "== " + v87 + " delay:" + v88 + "ping:" + v2.ping.ping + "jitter:" + v2.ping.jitter);
       v6.arrived = v89;
