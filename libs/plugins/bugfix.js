@@ -10,12 +10,15 @@ module.exports = function (v1, v2) {
   v1.hook(...v2.packet.get_all("S_CANNOT_START_SKILL"), hooks.MODIFY_ALL, (v7, v8) => {
     if (!v2.utils.isEnabled(v7.skill.id)) return;
     if (v4 > Date.now()) return false;
-    if (!v8) v2.log.ghost("server_reject_passthrough", {
-      skill: v7.skill?.id,
-      ping: v2.ping?.ping,
-      jitter: v2.ping?.jitter,
-      inAction: v2.action?.inAction
-    });
+    if (!v8) {
+      const playing = v2.action?.stage?.skill?.id;
+      v2.log.ghost(playing === v7.skill?.id ? "server_reject_playing" : "server_reject_other", {
+        skill: v7.skill?.id,
+        playing: playing,
+        ping: v2.ping?.ping,
+        inAction: v2.action?.inAction
+      });
+    }
     if (v8) v4 = Date.now() + v2.utils.getPacketBuffer();
   });
   v1.hook(...v2.packet.get_all("S_SYSTEM_MESSAGE"), hooks.MODIFY_ALL, v10 => {
