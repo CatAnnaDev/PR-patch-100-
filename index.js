@@ -4,6 +4,7 @@ const PROFILE = {
   on: false,
   stats: Object.create(null)
 };
+const CAPTURE_TIMER_STACKS = false;
 class ModWrapper {
   constructor(mod) {
     this._mod = mod;
@@ -82,10 +83,10 @@ class ModWrapper {
     return matches;
   };
   setTimeout = (callback, delay, ...args) => {
-    const stackError = new Error();
+    const stackError = CAPTURE_TIMER_STACKS ? new Error() : null;
     if (delay > 2147483647) {
       console.error("TimeoutOverflowWarning: " + delay);
-      console.error(stackError.stack);
+      if (stackError) console.error(stackError.stack);
       delay = 2147483647;
     }
     const threshold = 15;
@@ -112,8 +113,10 @@ class ModWrapper {
         try {
           callback(...args);
         } catch (err) {
-          console.log(stackError.stack);
-          console.log("----------------");
+          if (stackError) {
+            console.log(stackError.stack);
+            console.log("----------------");
+          }
           console.log(err);
         }
       },

@@ -1,32 +1,34 @@
 const fs = require("fs"),
   path = require("path");
 class Log {
-  addToHistory = (...v1) => {
-    this._history.push(v1);
-    const v3 = 400;
-    if (this._history.length > v3) this._history.splice(0, this._history.length - v3);
+  addToHistory = entry => {
+    const h = this._history;
+    h.push(entry);
+    if (h.length >= 800) this._history = h.slice(h.length - 400);
   };
+  formatEntry(entry) {
+    return "[PR][" + new Date(entry[0]).toLocaleTimeString() + "][" + entry[0] % 100000 + "][" + entry[1] + "]";
+  }
   debug = (v4, ...v5) => {
-    const v7 = Date.now(),
-      v8 = new Date(v7),
-      v9 = "[PR][" + v8.toLocaleTimeString() + "][" + v7 % 100000 + "][" + v4 + "]";
-    this.addToHistory(v9, ...v5);
+    const ts = Date.now();
+    this.addToHistory([ts, v4, v5]);
     if (!this?.mods?.settings?.debug) return;
-    console.log(v9, ...v5);
+    console.log(this.formatEntry([ts, v4, v5]), ...v5);
   };
   error = (v10, ...v11) => {
-    const v13 = Date.now(),
-      v14 = new Date(v13),
-      v15 = "[PR][" + v14.toLocaleTimeString() + "][" + v13 % 100000 + "][" + v10 + "]";
-    this.addToHistory(v15, ...v11);
-    console.log(v15, ...v11);
+    const ts = Date.now();
+    this.addToHistory([ts, v10, v11]);
+    console.log(this.formatEntry([ts, v10, v11]), ...v11);
   };
   save = (...v16) => {
     if (!v16.length) v16 = Date.now();else v16 = v16.join(" ");
     try {
       fs.mkdirSync(path.join(__dirname, "../../logs"));
     } catch (v18) {}
-    fs.writeFileSync(path.join(__dirname, "../../logs/" + v16 + ".txt"), this._history.map(v19 => v19.map(v20 => typeof v20 === "object" ? this.mods.library.jsonStringify(v20) : v20).join(" ")).join("\n"));
+    fs.writeFileSync(path.join(__dirname, "../../logs/" + v16 + ".txt"), this._history.map(entry => {
+      const body = entry[2].map(v => typeof v === "object" && v !== null ? this.mods.library.jsonStringify(v) : v).join(" ");
+      return this.formatEntry(entry) + " " + body;
+    }).join("\n"));
     this.mods.command.message("Saved log to [PR]/logs/" + v16 + ".txt");
   };
   toggleDebug = () => {
