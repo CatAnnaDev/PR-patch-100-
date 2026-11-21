@@ -23,7 +23,18 @@
     "weights": {
       "rubberband": 18,
       "mismatch": 0,
-      "reject": 0
-    }
+      "reject": 0,
+      "desync": 18
+    },
+    "autoInstant": true,
+    "fallbackFrac": 0.8,
+    "restoreFloor": 2,
+    "stallGapMs": 250,
+    "stallFactor": 0.15,
+    "loopLagMs": 40,
+    "loopFactor": 0.3,
+    "jitterPadK": 0.8,
+    "jitterPadDead": 8,
+    "jitterPadCap": 20
   }
 }

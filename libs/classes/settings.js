@@ -44,12 +44,14 @@ class Settings {
         }
       }
     };
+    this.defaults = v4;
     try {
       const v5 = JSON.parse(fs.readFileSync(path.join(__dirname, "../../config.json"), "utf-8"));
       this.info = Object.assign({}, v4, v5);
     } catch (v6) {
       this.info = v4;
     }
+    this.sanitize();
     this.mods.command.add("$default", this.toggle);
     this.mods.command.add("on", this.on);
     this.mods.command.add("off", this.off);
@@ -57,6 +59,78 @@ class Settings {
     this.mods.command.add("delay", this.delay);
     this.mods.command.add("jaunt", this.jaunt);
     this.mods.command.add("instant", this.instant);
+  }
+  coerceNumber(value, fallback, min, max) {
+    let n = typeof value === "number" ? value : parseFloat(value);
+    if (!Number.isFinite(n)) n = fallback;
+    if (min !== undefined && n < min) n = min;
+    if (max !== undefined && n > max) n = max;
+    return n;
+  }
+  coerceBool(value, fallback) {
+    if (typeof value === "boolean") return value;
+    if (typeof value === "number") return value !== 0;
+    if (typeof value === "string") {
+      const normalized = value.toLowerCase();
+      if (["true", "1", "on", "yes"].includes(normalized)) return true;
+      if (["false", "0", "off", "no"].includes(normalized)) return false;
+    }
+    return fallback;
+  }
+  sanitize() {
+    const info = this.info,
+      def = this.defaults;
+    const num = (key, min, max) => {
+      info[key] = this.coerceNumber(info[key], def[key], min, max);
+    };
+    const bool = key => {
+      info[key] = this.coerceBool(info[key], def[key]);
+    };
+    bool("enabled");
+    bool("block");
+    bool("jaunt");
+    bool("debug");
+    bool("instant");
+    num("dash", 0, 500);
+    num("delay", 0, 1000);
+    num("spikeCap", 0, 1000);
+    num("spikeDecay", 0, 100);
+    num("spikeMargin", 0, 100);
+    num("spikeNotify", 0, 1000);
+    if (typeof info.auto !== "object" || info.auto === null) info.auto = {};
+    const auto = info.auto,
+      autoDef = def.auto;
+    const anum = (key, min, max) => {
+      auto[key] = this.coerceNumber(auto[key], autoDef[key], min, max);
+    };
+    const abool = key => {
+      auto[key] = this.coerceBool(auto[key], autoDef[key]);
+    };
+    abool("enabled");
+    abool("autoInstant");
+    anum("maxMs", 0, 1000);
+    anum("floorMax", 0, 1000);
+    anum("recoveryPerMs", 0, 100);
+    anum("floorStep", 0, 1000);
+    anum("floorRecoveryPerMs", 0, 100);
+    anum("sustainMs", 0, 60000);
+    anum("sustainFrac", 0, 1);
+    anum("notify", 0, 1000);
+    anum("fallbackFrac", 0, 1);
+    anum("restoreFloor", 0, 1000);
+    anum("stallGapMs", 20, 60000);
+    anum("stallFactor", 0, 100);
+    anum("loopLagMs", 0, 60000);
+    anum("loopFactor", 0, 100);
+    anum("jitterPadK", 0, 100);
+    anum("jitterPadDead", 0, 1000);
+    anum("jitterPadCap", 0, 1000);
+    if (typeof auto.weights !== "object" || auto.weights === null) auto.weights = {};
+    const weights = auto.weights,
+      weightDef = autoDef.weights;
+    for (const key of ["desync", "rubberband", "mismatch", "reject"]) {
+      weights[key] = this.coerceNumber(weights[key], weightDef[key], 0, 1000);
+    }
   }
   instant = () => {
     this.info.instant = !this.info.instant;

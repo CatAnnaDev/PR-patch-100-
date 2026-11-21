@@ -13,6 +13,9 @@ module.exports = function (v1, v2) {
     jitSqSum = 0;
   const jitWin = [],
     JIT_N = 30;
+  const startTs = Date.now(),
+    rollWin = [],
+    ROLL_MS = 300000;
   const SPIKE_CAP = () => v2.settings.info.spikeCap ?? 150,
     SPIKE_DECAY_PER_MS = () => v2.settings.info.spikeDecay ?? 0.6,
     SPIKE_MARGIN = () => v2.settings.info.spikeMargin ?? 4;
@@ -110,10 +113,46 @@ module.exports = function (v1, v2) {
     const base = v2.settings.info.instant ? Math.min(SPIKE_CAP(), Math.round(spikeHold + jitterPad())) : Math.round(v2.ping.jitter);
     return base + safety + (v2.settings.info.delay || 0);
   };
+  const rollSampler = v1.setInterval(() => {
+    const now = Date.now();
+    rollWin.push({
+      ts: now,
+      ping: v2.ping.ping || 0,
+      jitter: v2.ping.jitter || 0,
+      eff: effectiveBuffer()
+    });
+    while (rollWin.length && now - rollWin[0].ts > ROLL_MS) rollWin.shift();
+  }, 1000);
+  const fmtUptime = ms => {
+    const s = Math.floor(ms / 1000);
+    return Math.floor(s / 60) + "m " + s % 60 + "s";
+  };
   v2.command.add("stats", () => {
     const safety = v2.auto ? v2.auto.safetyMs() : 0;
     const counts = v2.auto ? v2.auto.counts : {};
-    v2.command.message("\nPing: " + Math.round(v2.ping.ping) + " ms | calme: " + Math.round(pingBase ?? 0) + " | jitter: " + Math.round(v2.ping.jitter) + "\nSpike buffer: " + Math.round(spikeHold) + " | Jitter pad: " + Math.round(jitterPad()) + " | Auto buffer: " + safety + " ms\nInstant: " + (v2.settings.info.instant ? "on" : "off") + " | delay manuel: " + (v2.settings.info.delay || 0) + " ms\nLatence ajoutee ~ " + effectiveBuffer() + " ms\nDesync: " + (counts.desync || 0) + " | stall: " + (counts.stall || 0) + " | loop: " + (counts.loop || 0) + " | rubber-band: " + (counts.rubberband || 0));
+    const n = rollWin.length;
+    let line = "";
+    if (n) {
+      let pMin = Infinity,
+        pMax = 0,
+        pSum = 0,
+        jMin = Infinity,
+        jMax = 0,
+        jSum = 0,
+        zero = 0;
+      for (const s of rollWin) {
+        if (s.ping < pMin) pMin = s.ping;
+        if (s.ping > pMax) pMax = s.ping;
+        pSum += s.ping;
+        if (s.jitter < jMin) jMin = s.jitter;
+        if (s.jitter > jMax) jMax = s.jitter;
+        jSum += s.jitter;
+        if (s.eff === 0) zero++;
+      }
+      const mins = Math.round(n / 60);
+      line = "\nSur " + (mins >= 1 ? mins + " min" : n + " s") + ": ping " + Math.round(pMin) + "/" + Math.round(pSum / n) + "/" + Math.round(pMax) + " (min/moy/max) | jitter " + Math.round(jMin) + "/" + Math.round(jSum / n) + "/" + Math.round(jMax) + "\n0-ping pur: " + Math.round(100 * zero / n) + "% du temps";
+    }
+    v2.command.message("\nPing: " + Math.round(v2.ping.ping) + " ms | calme: " + Math.round(pingBase ?? 0) + " | jitter: " + Math.round(v2.ping.jitter) + "\nSpike buffer: " + Math.round(spikeHold) + " | Jitter pad: " + Math.round(jitterPad()) + " | Auto buffer: " + safety + " ms\nInstant: " + (v2.settings.info.instant ? "on" : "off") + " | delay manuel: " + (v2.settings.info.delay || 0) + " ms\nLatence ajoutee ~ " + effectiveBuffer() + " ms" + line + "\nUptime: " + fmtUptime(Date.now() - startTs) + " | fallbacks: " + (counts.fallbacks || 0) + "\nDesync: " + (counts.desync || 0) + " | stall: " + (counts.stall || 0) + " | loop: " + (counts.loop || 0) + " | rubber-band: " + (counts.rubberband || 0));
   });
   let telemetryTimer = null;
   const telemetryFile = nodePath.join(__dirname, "../../telemetry.csv");

@@ -15,7 +15,8 @@ class AutoTune {
       mismatch: 0,
       reject: 0,
       stall: 0,
-      loop: 0
+      loop: 0,
+      fallbacks: 0
     };
     this.registerCommands();
   }
@@ -73,6 +74,7 @@ class AutoTune {
       if (!this.instantForcedOff && info.instant && this.floor >= cfg.floorMax * cfg.fallbackFrac) {
         info.instant = false;
         this.instantForcedOff = true;
+        this.counts.fallbacks = (this.counts.fallbacks || 0) + 1;
         this.mods.command?.message?.("Connexion degradee: bascule en mode jitter (instant off) le temps que ca se calme.");
       } else if (this.instantForcedOff && this.floor <= cfg.restoreFloor) {
         info.instant = true;
