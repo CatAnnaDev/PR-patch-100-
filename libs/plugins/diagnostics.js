@@ -20,7 +20,7 @@ module.exports = function (mod, lib) {
     let done = 0,
       sum = 0,
       max = 0;
-    lib.command.message("Self-test en cours (mesure timer ~" + (target * samples / 1000).toFixed(1) + "s)...");
+    lib.command.message("Self-test running (timer measurement ~" + (target * samples / 1000).toFixed(1) + "s)...");
     for (let i = 0; i < samples; i++) {
       const expected = Date.now() + target;
       mod.setTimeout(() => {
@@ -29,8 +29,8 @@ module.exports = function (mod, lib) {
         if (drift > max) max = drift;
         done++;
         if (done === samples) {
-          const grade = max <= 16 ? "excellent" : max <= 40 ? "correct" : "degrade";
-          lib.command.message("\nSelf-test:\nModule ping: " + (pingOk ? "OK (" + Math.round(pingValue) + " ms)" : "ABSENT") + "\nPaquets cles: " + resolved + "/" + keyPackets.length + (missing.length ? " (manquants: " + missing.join(", ") + ")" : "") + "\nGouverneur auto: " + (autoOk ? "OK" : "absent") + " | Health: " + (healthOk ? "OK" : "absent") + "\nPrecision timer: derive moy " + (sum / samples).toFixed(1) + " ms, max " + max + " ms (" + grade + ")");
+          const grade = max <= 16 ? "excellent" : max <= 40 ? "good" : "degraded";
+          lib.command.message("\nSelf-test:\nPing module: " + (pingOk ? "OK (" + Math.round(pingValue) + " ms)" : "MISSING") + "\nKey packets: " + resolved + "/" + keyPackets.length + (missing.length ? " (missing: " + missing.join(", ") + ")" : "") + "\nAuto governor: " + (autoOk ? "OK" : "missing") + " | Health: " + (healthOk ? "OK" : "missing") + "\nTimer precision: avg drift " + (sum / samples).toFixed(1) + " ms, max " + max + " ms (" + grade + ")");
         }
       }, target);
     }

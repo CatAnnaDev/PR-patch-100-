@@ -47,11 +47,11 @@ module.exports = function (v1, v2) {
         spiking = true;
         spikePeak = excess;
         spikeStart = now;
-        v2.command.message("Lag spike: ping " + Math.round(p) + " ms (+" + Math.round(excess) + " vs calme " + Math.round(pingBase) + ")");
+        v2.command.message("Lag spike: ping " + Math.round(p) + " ms (+" + Math.round(excess) + " vs calm " + Math.round(pingBase) + ")");
       } else if (spiking) {
         if (excess > spikePeak) spikePeak = excess;
         if (excess < notify * 0.4) {
-          v2.command.message("Connexion stabilisee (pic +" + Math.round(spikePeak) + " ms, " + (now - spikeStart) + " ms)");
+          v2.command.message("Connection stabilized (peak +" + Math.round(spikePeak) + " ms, " + (now - spikeStart) + " ms)");
           spiking = false;
         }
       }
@@ -151,9 +151,9 @@ module.exports = function (v1, v2) {
         if (s.eff === 0) zero++;
       }
       const mins = Math.round(n / 60);
-      line = "\nSur " + (mins >= 1 ? mins + " min" : n + " s") + ": ping " + Math.round(pMin) + "/" + Math.round(pSum / n) + "/" + Math.round(pMax) + " (min/moy/max) | jitter " + Math.round(jMin) + "/" + Math.round(jSum / n) + "/" + Math.round(jMax) + "\n0-ping pur: " + Math.round(100 * zero / n) + "% du temps";
+      line = "\nOver " + (mins >= 1 ? mins + " min" : n + " s") + ": ping " + Math.round(pMin) + "/" + Math.round(pSum / n) + "/" + Math.round(pMax) + " (min/avg/max) | jitter " + Math.round(jMin) + "/" + Math.round(jSum / n) + "/" + Math.round(jMax) + "\nPure zero-ping: " + Math.round(100 * zero / n) + "% of the time";
     }
-    v2.command.message("\nPing: " + Math.round(v2.ping.ping) + " ms | calme: " + Math.round(pingBase ?? 0) + " | jitter: " + Math.round(v2.ping.jitter) + "\nSpike buffer: " + Math.round(spikeHold) + " | Jitter pad: " + Math.round(jitterPad()) + " | Auto buffer: " + safety + " ms\nInstant: " + (v2.settings.info.instant ? "on" : "off") + " | delay manuel: " + (v2.settings.info.delay || 0) + " ms\nLatence ajoutee ~ " + effectiveBuffer() + " ms" + line + "\nAdaptive retry: " + (v2.settings.info.adaptiveRetry ? "on" : "off") + " | adaptive chain: " + (v2.settings.info.adaptiveChain ? "on" : "off") + "\nUptime: " + fmtUptime(Date.now() - startTs) + " | fallbacks: " + (counts.fallbacks || 0) + "\nDesync: " + (counts.desync || 0) + " | stall: " + (counts.stall || 0) + " | loop: " + (counts.loop || 0) + " | rubber-band: " + (counts.rubberband || 0));
+    v2.command.message("\nPing: " + Math.round(v2.ping.ping) + " ms | calm: " + Math.round(pingBase ?? 0) + " | jitter: " + Math.round(v2.ping.jitter) + "\nSpike buffer: " + Math.round(spikeHold) + " | Jitter pad: " + Math.round(jitterPad()) + " | Auto buffer: " + safety + " ms\nInstant: " + (v2.settings.info.instant ? "on" : "off") + " | manual delay: " + (v2.settings.info.delay || 0) + " ms\nAdded latency ~ " + effectiveBuffer() + " ms" + line + "\nAdaptive retry: " + (v2.settings.info.adaptiveRetry ? "on" : "off") + " | adaptive chain: " + (v2.settings.info.adaptiveChain ? "on" : "off") + "\nUptime: " + fmtUptime(Date.now() - startTs) + " | fallbacks: " + (counts.fallbacks || 0) + "\nDesync: " + (counts.desync || 0) + " | stall: " + (counts.stall || 0) + " | loop: " + (counts.loop || 0) + " | rubber-band: " + (counts.rubberband || 0));
   });
   let telemetryTimer = null;
   const telemetryFile = nodePath.join(__dirname, "../../telemetry.csv");
@@ -174,7 +174,7 @@ module.exports = function (v1, v2) {
         fs.appendFileSync(telemetryFile, row);
       } catch (e) {}
     }, 1000);
-    v2.command.message("Telemetry on -> telemetry.csv (1 ligne/s)");
+    v2.command.message("Telemetry on -> telemetry.csv (1 line/s)");
   });
   v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.READ_REAL, v34 => {
     if (!v2.player.isMe(v34.gameId)) return;

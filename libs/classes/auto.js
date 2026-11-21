@@ -75,15 +75,15 @@ class AutoTune {
         info.instant = false;
         this.instantForcedOff = true;
         this.counts.fallbacks = (this.counts.fallbacks || 0) + 1;
-        this.mods.command?.message?.("Connexion degradee: bascule en mode jitter (instant off) le temps que ca se calme.");
+        this.mods.command?.message?.("Connection degraded: switching to jitter mode (instant off) until it settles.");
       } else if (this.instantForcedOff && this.floor <= cfg.restoreFloor) {
         info.instant = true;
         this.instantForcedOff = false;
-        this.mods.command?.message?.("Connexion retablie: retour au mode instant (0 ping).");
+        this.mods.command?.message?.("Connection restored: back to instant mode (zero ping).");
       }
     }
     if (this.pressure === 0 && this.floor === 0 && this.notified && cfg.notify > 0) {
-      this.mods.command.message("Connexion stable, retour au 0 ping.");
+      this.mods.command.message("Connection stable, back to zero ping.");
       this.notified = false;
     }
   }
@@ -101,7 +101,7 @@ class AutoTune {
     const buffer = Math.max(this.pressure, this.floor);
     if (cfg.notify > 0 && !this.notified && buffer >= cfg.notify) {
       this.notified = true;
-      this.mods.command?.message?.("Tampon anti-desync actif (+" + Math.round(buffer) + " ms) pour lisser la connexion.");
+      this.mods.command?.message?.("Anti-desync buffer active (+" + Math.round(buffer) + " ms) to smooth the connection.");
     }
   }
   hit(kind) {
@@ -128,7 +128,7 @@ class AutoTune {
   report = () => {
     this.advance();
     const cfg = this.cfg;
-    this.mods.command.message("\nAuto-tune: " + (cfg.enabled ? "on" : "off") + "\nTampon live: " + Math.round(this.pressure) + " / " + cfg.maxMs + " ms\nPlancher adaptatif: " + Math.round(this.floor) + " / " + cfg.floorMax + " ms\nMode: " + (this.instantForcedOff ? "jitter (fallback auto)" : "instant") + "\nEvenements -> desync: " + this.counts.desync + " | stall: " + this.counts.stall + " | loop: " + this.counts.loop + " | rubber-band: " + this.counts.rubberband + " | reject: " + this.counts.reject);
+    this.mods.command.message("\nAuto-tune: " + (cfg.enabled ? "on" : "off") + "\nLive buffer: " + Math.round(this.pressure) + " / " + cfg.maxMs + " ms\nAdaptive floor: " + Math.round(this.floor) + " / " + cfg.floorMax + " ms\nMode: " + (this.instantForcedOff ? "jitter (auto fallback)" : "instant") + "\nEvents -> desync: " + this.counts.desync + " | stall: " + this.counts.stall + " | loop: " + this.counts.loop + " | rubber-band: " + this.counts.rubberband + " | reject: " + this.counts.reject);
   };
   destructor() {}
 }
