@@ -593,7 +593,9 @@ class Skills extends EventEmitter {
     if (this.mods.player.job === classes.ARCHER && (this.mod.patch >= 114 ? [340101, 340102] : [340100]).includes(v175)) v177.dist = 0;
     const v180 = v179?.holdIfNotMoving && !this.mods.last.packet("C_START_SKILL")?.moving;
     if (v177.dist === 1 && !v180) return [];
-    const v181 = JSON.parse(JSON.stringify(v179?.animSeq?.[v176] || []));
+    const v181 = (v179?.animSeq?.[v176] || []).map(v240 => ({
+      ...v240
+    }));
     for (const v182 of v181) {
       v182.distance *= v177.dist * (v180 ? 0 : 1);
     }
