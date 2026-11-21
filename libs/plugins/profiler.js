@@ -1,3 +1,5 @@
+const fs = require("fs"),
+  nodePath = require("path");
 module.exports = function (mod, lib) {
   let P = null;
   try {
@@ -6,6 +8,7 @@ module.exports = function (mod, lib) {
     P = null;
   }
   if (!lib.command || !P) return;
+  const reportFile = nodePath.join(__dirname, "../../profiler_report.txt");
   const toggle = () => {
     P.on = !P.on;
     if (P.on) P.stats = Object.create(null);
@@ -31,10 +34,19 @@ module.exports = function (mod, lib) {
         tot: s.total
       };
     }).sort((x, y) => y.tot - x.tot);
-    lib.command.message("packet | calls | avg ns | max ns | total us" + (P.on ? "" : " (profiler OFF)"));
-    for (const r of rows.slice(0, 20)) {
+    const header = "packet | calls | avg_ns | max_ns | total_us";
+    const lines = rows.map(r => r.k.padEnd(32) + " | " + String(r.n).padStart(7) + " | " + String(Math.round(r.avg)).padStart(8) + " | " + String(r.max).padStart(9) + " | " + String(Math.round(r.tot / 1000)).padStart(9));
+    const text = header + "\n" + lines.join("\n") + "\n";
+    try {
+      fs.writeFileSync(reportFile, text);
+    } catch (e) {}
+    console.log("\n[ping-remover profiler] " + rows.length + " packets" + (P.on ? "" : " (profiler OFF)") + "\n" + header + "\n" + lines.join("\n"));
+    lib.command.message("Report written. Top by total cost:");
+    lib.command.message(header);
+    for (const r of rows.slice(0, 8)) {
       lib.command.message(r.k + " | " + r.n + " | " + Math.round(r.avg) + " | " + r.max + " | " + Math.round(r.tot / 1000));
     }
+    lib.command.message("Full table: mods/ping-remover-legacy-main/profiler_report.txt");
   };
   lib.command.add("profile", toggle);
   lib.command.add("profilereset", reset);

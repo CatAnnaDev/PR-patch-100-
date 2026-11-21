@@ -15,14 +15,6 @@
   "retryLoadScale": 15,
   "adaptiveChain": false,
   "chainSmooth": 0.3,
-  "boss": {
-    "enabled": true,
-    "minCombatFPS": 60,
-    "speedMultiplier": 1,
-    "trustSamples": 3,
-    "outlierFrac": 0.35,
-    "minAlpha": 0.15
-  },
   "auto": {
     "enabled": false,
     "maxMs": 50,
@@ -39,7 +31,7 @@
       "reject": 0,
       "desync": 18
     },
-    "autoInstant": false,
+    "autoInstant": true,
     "fallbackFrac": 0.8,
     "restoreFloor": 2,
     "stallGapMs": 250,
