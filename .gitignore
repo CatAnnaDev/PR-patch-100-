@@ -4,3 +4,4 @@ index.js.obf.bak
 node_modules/
 *.log
 .DS_Store
+boss_data.json

@@ -16,7 +16,8 @@
         "skill-prediction",
         "ngsp",
         "ngsp_100",
-        "ngsp_92"
+        "ngsp_92",
+        "boss-ping-remover"
     ],
     "disableAutoUpdate": true,
     "drmKey": "LEGACY"

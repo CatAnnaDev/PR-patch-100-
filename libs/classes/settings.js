@@ -21,6 +21,14 @@ class Settings {
       retryLoadScale: 15,
       adaptiveChain: false,
       chainSmooth: 0.3,
+      boss: {
+        enabled: true,
+        minCombatFPS: 60,
+        speedMultiplier: 1,
+        trustSamples: 3,
+        outlierFrac: 0.35,
+        minAlpha: 0.15
+      },
       auto: {
         enabled: true,
         maxMs: 50,
@@ -66,7 +74,12 @@ class Settings {
     this.mods.command.add("instant", this.instant);
     this.mods.command.add("aretry", this.aretry);
     this.mods.command.add("achain", this.achain);
+    this.mods.command.add("boss", this.boss);
   }
+  boss = () => {
+    this.info.boss.enabled = !this.info.boss.enabled;
+    this.mods.command.message("Boss ping remover has been turned", this.info.boss.enabled ? "on" : "off");
+  };
   aretry = () => {
     this.info.adaptiveRetry = !this.info.adaptiveRetry;
     this.mods.command.message("Adaptive retry has been turned", this.info.adaptiveRetry ? "on" : "off");
@@ -117,6 +130,15 @@ class Settings {
     num("retryMaxExtra", 0, 20);
     num("retryLoadScale", 1, 1000);
     num("chainSmooth", 0, 1);
+    if (typeof info.boss !== "object" || info.boss === null) info.boss = {};
+    const boss = info.boss,
+      bossDef = def.boss;
+    boss.enabled = this.coerceBool(boss.enabled, bossDef.enabled);
+    boss.minCombatFPS = this.coerceNumber(boss.minCombatFPS, bossDef.minCombatFPS, 1, 1000);
+    boss.speedMultiplier = this.coerceNumber(boss.speedMultiplier, bossDef.speedMultiplier, 0.1, 5);
+    boss.trustSamples = this.coerceNumber(boss.trustSamples, bossDef.trustSamples, 1, 100);
+    boss.outlierFrac = this.coerceNumber(boss.outlierFrac, bossDef.outlierFrac, 0, 1);
+    boss.minAlpha = this.coerceNumber(boss.minAlpha, bossDef.minAlpha, 0, 1);
     if (typeof info.auto !== "object" || info.auto === null) info.auto = {};
     const auto = info.auto,
       autoDef = def.auto;
