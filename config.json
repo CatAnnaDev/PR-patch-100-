@@ -1,0 +1,29 @@
+{
+  "enabled": true,
+  "block": true,
+  "jaunt": true,
+  "debug": false,
+  "dash": 0,
+  "delay": 0,
+  "instant": true,
+  "spikeCap": 150,
+  "spikeDecay": 0.6,
+  "spikeMargin": 4,
+  "spikeNotify": 40,
+  "auto": {
+    "enabled": true,
+    "maxMs": 50,
+    "floorMax": 40,
+    "recoveryPerMs": 0.08,
+    "floorStep": 8,
+    "floorRecoveryPerMs": 0.004,
+    "sustainMs": 1500,
+    "sustainFrac": 0.7,
+    "notify": 0,
+    "weights": {
+      "rubberband": 18,
+      "mismatch": 0,
+      "reject": 0
+    }
+  }
+}

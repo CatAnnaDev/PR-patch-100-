@@ -1,0 +1,23 @@
+{
+    "name": "ping-remover-legacy",
+    "version": "1.1.0",
+    "author": "ballzyxx && CatAnnaDev",
+    "description": "Ping-Remover (patch 100) CatAnnaDev",
+    "options": {
+        "guiName": "Ping-Remover (patch 100) update CatAnnaDev"
+    },
+    "dependencies": {
+        "library": "https://raw.githubusercontent.com/tera-private-toolbox/library/master/module.json",
+        "ping": "https://git.teragame.su/tera/ping/raw/master/module.json"
+    },
+    "conflicts": [
+        "ping-remover-agaia",
+        "ping-remover",
+        "skill-prediction",
+        "ngsp",
+        "ngsp_100",
+        "ngsp_92"
+    ],
+    "disableAutoUpdate": true,
+    "drmKey": "LEGACY"
+}

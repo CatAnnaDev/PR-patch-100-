@@ -1,0 +1,6 @@
+telemetry.csv
+libs.obf.bak/
+index.js.obf.bak
+node_modules/
+*.log
+.DS_Store

@@ -1,0 +1,47 @@
+{
+    "files": {
+        "CHANGELOG.md": "476927a38e0d8a6b0c0c251e8ac9f90f7ece564d9c9e516d81ebced916be4e8a",
+        "config.json": {
+            "overwrite": false,
+            "hash": "580884fdb6b0f4976adb84f77b4e353f65686d45e66562193cba8a2a26ae3c14"
+        },
+        "index.js": "802b3f0d3c9030977ce2ffa8086e298fd501acd7e1191f83d0158f4e8a96a205",
+        "libs/classes/action.js": "066292cc8b6ec32c598b9103396a3cb30c19e8758c0304ddf97f75c817883706",
+        "libs/classes/command.js": "bedef38db4b2da1c1d6de37f83f0ff7d56e73cba65ef84d41fcc3bd6001c15ef",
+        "libs/classes/cooldown.js": "d6b2a16d310df70c22f6c1abc934d4c88499371bf1d4c92c5ab667ffbe652376",
+        "libs/classes/crowd_control.js": "9d94eb002cc3154bd988df5bc478cfb332f12bc9cabb9919246b55229ec7e55c",
+        "libs/classes/datacenter.js": "ca1cf35f8219f7474b1a64a1af9cb48d8d654484aae51828bf5f1e0a1625077b",
+        "libs/classes/effects.js": "7a1d280fd63d1f53d40534388b44b71fbf31c53c641196c1dcf2125d3f440c24",
+        "libs/classes/hardcoded.js": "2455666dc46afb3c3255949bdb331963f5669c35db0e8d3c9ac00382812e6742",
+        "libs/classes/last.js": "db36bc5c18d35aa284ab31e8610b4aae57a07a2f372c83720abc910d380de917",
+        "libs/classes/log.js": "505f52b0d952d8dcec44998bac77958a499dd41cea2d135db8fcdca172321203",
+        "libs/classes/ping.js": "55581e27b8845a19348ee877f9a1ba7a34a2bf5f97f60677e38323fa4bc4c87a",
+        "libs/classes/position.js": "a4aceea25c092c2d014d0f69df7c7c67893fcb654e3d463c1610ed596e86de20",
+        "libs/classes/settings.js": "81d2bd4ba8538884232865aafa060bca26f5c438e68f095f166c5c5bf7a2bb83",
+        "libs/classes/skills.js": "72a0664468efe909940460e55431735fde28412e3af470074e57d778c00d2b8c",
+        "libs/classes/utils.js": "e23cdf7629ff0b11074000b48dd0fef7296acb6f691e31220a4a77f8f48473bb",
+        "libs/enums/classes.js": "fe756abe87be2aa27fc88f81adbe600c02ca146c5a65e04499a5ae2202ae4ce0",
+        "libs/enums/hooks.js": "9635e5879b094e8672cba4f18c10f601ea2e050d5c98ed389b6e6db74e0f95e0",
+        "libs/plugins/abnormality.js": "adac83a8446a4ee979a60040f9e499e96d6112e70a1188be190a4086c2df82ca",
+        "libs/plugins/abnormality_effects.js": "81c07725503a65225cfd1698fb05c9dbfe322393bfd3cd19808061ffd40b45ea",
+        "libs/plugins/anti_desync.js": "c55f5ec84a8711b07e80e7c0d3e217334ca31940d3bd7fa52cca29a41beb034d",
+        "libs/plugins/bugfix.js": "a07d8eb9a533ba84b72b5ade265381e76489f616fe430c23a663645efa354f62",
+        "libs/plugins/cooldown.js": "975fca6ac6fa7c75dd123a27ae71e0d44de579143cb331d19391e187aa112701",
+        "libs/plugins/crowd_control.js": "27868106f83031262769ed0410e7e2200ba845481769132f5f4c0bd72f120f53",
+        "libs/plugins/debug.js": "0fb9c81e9c980d993eac0d19f2e64828d14980488745545a2dc6b808e68520eb",
+        "libs/plugins/emulation.js": "6376edfe48753028635dbec27934d860039174a6f0fc23927d11f8deb34badbe",
+        "libs/plugins/emulation_effects.js": "d86c2aafebd26e86363738a30a2cc5595f0a56191811305efdde7df741ab48b0",
+        "libs/plugins/hardcoded.js": "c01200ee0b555e18770ab194fc4503fd0e1d464fad751bb69c4cf9f3aeb2faf3",
+        "libs/plugins/items.js": "272b27ac46c316396432a0d8d2f1a4cbce9acbe4d2ef1fb68f6335ee02af9713",
+        "libs/plugins/lockons.js": "30ea78469fdf21bea0744dcaf61b72a418c7dfb0766c4d9c69b34d1f0e5930b6",
+        "libs/plugins/logger.js": "7e92325e1652cf33b3816278356571f84d7555e165777de77126f7e7a73cda06",
+        "libs/plugins/projectiles.js": "058cd49629b11deeb134d4a4fffaa9cf11114efde43c6fc9e608d76516bafc68",
+        "libs/plugins/recall.js": "4755019f60ceeec891917c12a963f4db51402172ef841251347afec4ee662e88",
+        "libs/plugins/smooth_block.js": "6a2032d0bc0bd3ee947d85b0afc82518b69fc45393fb68e775c5742eb9b5f97a",
+        "module.json": "0f1d893520d6bf2186907a5e35538958d6640bf2e1aa5ecb32ebe0339fa18fb7",
+        "skills.json": {
+            "overwrite": false,
+            "hash": "dd68e41ecc4d3657600719903464a0d0e9382ae135b3dbbcc0529d581bf3c3ba"
+        }
+    }
+}
