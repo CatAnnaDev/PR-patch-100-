@@ -1,6 +1,7 @@
 const hooks = require("../enums/hooks"),
   classes = require("../enums/classes");
 module.exports = function (mod, lib) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = lib.packet.get_all(n));
   let v4 = -1.5;
   const v5 = ["defence", "movingDefence", "pressHit"];
   lib.command.add("desync", v9 => {
@@ -37,26 +38,26 @@ module.exports = function (mod, lib) {
       v21.loc = v7();
       return true;
     };
-  mod.hook(...lib.packet.get_all("C_START_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
-  mod.hook(...lib.packet.get_all("C_START_TARGETED_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
-  mod.hook(...lib.packet.get_all("C_START_COMBO_INSTANT_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
-  mod.hook(...lib.packet.get_all("C_START_INSTANCE_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
-  mod.hook(...lib.packet.get_all("C_START_INSTANCE_SKILL_EX"), hooks.MODIFY_INTERNAL_REAL, v8);
-  mod.hook(...lib.packet.get_all("C_PRESS_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
-  mod.hook(...lib.packet.get_all("C_PLAYER_LOCATION"), hooks.MODIFY_REAL, v23 => {
+  mod.hook(...pk("C_START_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
+  mod.hook(...pk("C_START_TARGETED_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
+  mod.hook(...pk("C_START_COMBO_INSTANT_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
+  mod.hook(...pk("C_START_INSTANCE_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
+  mod.hook(...pk("C_START_INSTANCE_SKILL_EX"), hooks.MODIFY_INTERNAL_REAL, v8);
+  mod.hook(...pk("C_PRESS_SKILL"), hooks.MODIFY_INTERNAL_REAL, v8);
+  mod.hook(...pk("C_PLAYER_LOCATION"), hooks.MODIFY_REAL, v23 => {
     if (!lib.utils.isEnabled()) return;
     if (v6(v23.loc)) return false;
   });
-  mod.hook(...lib.packet.get_all("S_ACTION_END"), hooks.MODIFY_INTERNAL_FAKE, v25 => {
+  mod.hook(...pk("S_ACTION_END"), hooks.MODIFY_INTERNAL_FAKE, v25 => {
     if (!lib.utils.isEnabled(v25.skill.id) || !lib.player.isMe(v25.gameId)) return;
     if (!v6(v25.loc)) return;
     if ([21, 22].includes(lib.skills.getTypeId(v25.skill.id))) return;
     lib.log.debug("AD", "sending S_INSTANT_MOVE");
     v25.loc = v7();
-    mod.send(...lib.packet.get_all("S_INSTANT_MOVE"), v25);
+    mod.send(...pk("S_INSTANT_MOVE"), v25);
     return true;
   });
-  mod.hook(...lib.packet.get_all("C_NOTIFY_LOCATION_IN_ACTION"), hooks.MODIFY_REAL, v27 => {
+  mod.hook(...pk("C_NOTIFY_LOCATION_IN_ACTION"), hooks.MODIFY_REAL, v27 => {
     if (!lib.utils.isEnabled(v27.skill.id)) return;
     if (v6(v27.loc)) return false;
     if (lib.player.job === classes.SLAYER && lib.utils.getSkillInfo(v27.skill.id).skill === 17) return;

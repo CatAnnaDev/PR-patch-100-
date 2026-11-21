@@ -1,11 +1,12 @@
 const hooks = require("../enums/hooks");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let v4 = [],
     v5 = false,
     v6 = null;
   const v7 = () => {
       v5 = false;
-      if (v6) v1.send(...v2.packet.get_all(v6._name), v6);
+      if (v6) v1.send(...pk(v6._name), v6);
     },
     v8 = () => {
       return v2.player.job === 9 && v2.skills.isSupported(210300);
@@ -33,7 +34,7 @@ module.exports = function (v1, v2) {
     v12 = () => {
       if (v5 && v2.utils.isEnabled()) {
         v2.log.debug("RECALL", "blocking packet due to being in recall");
-        v1.send(...v2.packet.get_all("S_CANNOT_START_SKILL"), {
+        v1.send(...pk("S_CANNOT_START_SKILL"), {
           skill: v2.last.startSkill.skill.id
         });
         return false;
@@ -51,9 +52,9 @@ module.exports = function (v1, v2) {
       v5 = false;
     },
     v15 = () => {
-      v4.push(v1.hook(...v2.packet.get_all("S_CREATURE_LIFE"), hooks.READ_DESTINATION_ALL, v14));
-      v4.push(v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.MODIFY_INTERNAL_REAL, v10));
-      v4.push(v1.hook(...v2.packet.get_all("S_ACTION_END"), hooks.MODIFY_INTERNAL_REAL, v11));
+      v4.push(v1.hook(...pk("S_CREATURE_LIFE"), hooks.READ_DESTINATION_ALL, v14));
+      v4.push(v1.hook(...pk("S_ACTION_STAGE"), hooks.MODIFY_INTERNAL_REAL, v10));
+      v4.push(v1.hook(...pk("S_ACTION_END"), hooks.MODIFY_INTERNAL_REAL, v11));
       v4.push(v1.hook("C_START_SKILL", "event", hooks.MODIFY_INTERNAL_REAL, v12));
       v4.push(v1.hook("C_START_TARGETED_SKILL", "event", hooks.MODIFY_INTERNAL_REAL, v12));
       v4.push(v1.hook("C_START_COMBO_INSTANT_SKILL", "event", hooks.MODIFY_INTERNAL_REAL, v12));

@@ -1,5 +1,6 @@
 const hooks = require("../enums/hooks");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let v4 = {},
     v5 = {},
     v6 = {},
@@ -23,19 +24,19 @@ module.exports = function (v1, v2) {
           duration: +(v16 || v18.time || 0),
           stacks: v19?.stacks || 1
         };
-      v1.send(...v2.packet.get_all("S_ABNORMALITY_" + (v19 ? "REFRESH" : "BEGIN")), v20);
+      v1.send(...pk("S_ABNORMALITY_" + (v19 ? "REFRESH" : "BEGIN")), v20);
       v4[v14] = Date.now() + v2.utils.getPacketBuffer();
       v1.clearTimeout(v6[v14]);
       if (v20.duration <= 2147483647) v6[v14] = v1.setTimeout(v10, v20.duration, v14);
     },
     v10 = v22 => {
-      v1.send(...v2.packet.get_all("S_ABNORMALITY_END"), {
+      v1.send(...pk("S_ABNORMALITY_END"), {
         target: v2.player.gameId,
         id: v22
       });
       v5[v22] = Date.now() + v2.utils.getPacketBuffer();
     };
-  v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.READ_DESTINATION_FAKE, v24 => {
+  v1.hook(...pk("S_ACTION_STAGE"), hooks.READ_DESTINATION_FAKE, v24 => {
     if (!v2.player.isMe(v24.gameId)) return;
     if (!v2.utils.isEnabled(v24.skill.id)) return;
     if (v24.stage !== 0) return;
@@ -58,7 +59,7 @@ module.exports = function (v1, v2) {
             v1.clearTimeout(v6[v30]);
             v6[v30] = undefined;
             v4[v30] = undefined;
-            v1.send(...v2.packet.get_all("S_ABNORMALITY_END"), {
+            v1.send(...pk("S_ABNORMALITY_END"), {
               target: v2.player.gameId,
               id: v30
             });
@@ -78,7 +79,7 @@ module.exports = function (v1, v2) {
           v1.clearTimeout(v6[v30]);
           v6[v30] = undefined;
           v5[v30] = undefined;
-          v1.send(...v2.packet.get_all("S_ABNORMALITY_BEGIN"), {
+          v1.send(...pk("S_ABNORMALITY_BEGIN"), {
             target: v2.player.gameId,
             source: 0x0n,
             id: v30,
@@ -126,7 +127,7 @@ module.exports = function (v1, v2) {
       }, v55, v50, v24.skill.id, v53);
     }
   });
-  v1.hook(...v2.packet.get_all("S_ACTION_END"), hooks.READ_DESTINATION_FAKE, v59 => {
+  v1.hook(...pk("S_ACTION_END"), hooks.READ_DESTINATION_FAKE, v59 => {
     if (!v2.player.isMe(v59.gameId)) return;
     if (!v2.utils.isEnabled(v59.skill.id)) return;
     for (const v63 of v8[v59.skill.id] || []) {
@@ -166,18 +167,18 @@ module.exports = function (v1, v2) {
     v71.duration -= v2.ping.ping + v2.ping.jitter;
     if (v71.duration <= 2147483647) v6[v71.id] = v1.setTimeout(v10, v71.duration, v71.id);
     if (v73 && !v70) {
-      v1.send(...v2.packet.get_all("S_ABNORMALITY_REFRESH"), v71);
+      v1.send(...pk("S_ABNORMALITY_REFRESH"), v71);
       return false;
     }
     if (v70 && !v73) {
-      v1.send(...v2.packet.get_all("S_ABNORMALITY_BEGIN"), v71);
+      v1.send(...pk("S_ABNORMALITY_BEGIN"), v71);
       return false;
     }
     return true;
   };
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_BEGIN"), hooks.MODIFY_REAL, v11());
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_REFRESH"), hooks.MODIFY_REAL, v11(true));
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_END"), hooks.MODIFY_REAL, v77 => {
+  v1.hook(...pk("S_ABNORMALITY_BEGIN"), hooks.MODIFY_REAL, v11());
+  v1.hook(...pk("S_ABNORMALITY_REFRESH"), hooks.MODIFY_REAL, v11(true));
+  v1.hook(...pk("S_ABNORMALITY_END"), hooks.MODIFY_REAL, v77 => {
     if (!v2.player.isMe(v77.target)) return;
     if (!v2.utils.isEnabled()) return;
     const v79 = Date.now();

@@ -3,6 +3,7 @@ const hooks = require("../enums/hooks"),
   fs = require("fs"),
   nodePath = require("path");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let pingBase = null,
     spikeHold = 0,
     spikeLastTs = Date.now(),
@@ -177,14 +178,14 @@ module.exports = function (v1, v2) {
     }, 1000);
     v2.command.message("Telemetry on -> telemetry.csv (1 line/s)");
   });
-  v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.READ_REAL, v34 => {
+  v1.hook(...pk("S_ACTION_STAGE"), hooks.READ_REAL, v34 => {
     if (!v2.player.isMe(v34.gameId)) return;
     if (v4 !== v34.skill.id) {
       v2.log.debug("EMULATION-VALIDATION", "NOT CORRECT IDS");
       if (v2.auto) v2.auto.hit("mismatch");
     }
   });
-  v1.hook(...v2.packet.get_all("S_ACTION_END"), hooks.READ_REAL, v36 => {
+  v1.hook(...pk("S_ACTION_END"), hooks.READ_REAL, v36 => {
     if (!v2.player.isMe(v36.gameId)) return;
     if (!v36.type) return;
     if (v5 !== v36.type) {
@@ -254,11 +255,11 @@ module.exports = function (v1, v2) {
         v2.log.debug("EMULATION", "newSkillData changed value:", v59);
         if (v59.failed !== v53.failed && (v59.time || 0) < 0) {
           v2.log.debug("EMULATION", "Cancelling skill execution due to time being in the future");
-          v1.send(...v2.packet.get_all("S_CANNOT_START_SKILL"), {
+          v1.send(...pk("S_CANNOT_START_SKILL"), {
             skill: v52.skill
           });
           v7 = true;
-          v1.send(...v2.packet.get_all(v51), v52);
+          v1.send(...pk(v51), v52);
           v7 = false;
           return;
         }
@@ -280,7 +281,7 @@ module.exports = function (v1, v2) {
       if (v60 !== v54) v2.log.debug("EMULATION", "cast changed value: " + v60);
       if (![-11, -3737, -17, -999].includes(v60)) {
         v7 = true;
-        v1.send(...v2.packet.get_all(v51), v52);
+        v1.send(...pk(v51), v52);
         v7 = false;
       }
       if (v2.skills.getRawAnimationLength(v59.skillId) === 0) {
@@ -288,7 +289,7 @@ module.exports = function (v1, v2) {
         return;
       }
       if (v60 < -4) {
-        v1.send(...v2.packet.get_all("S_CANNOT_START_SKILL"), {
+        v1.send(...pk("S_CANNOT_START_SKILL"), {
           skill: v52.skill
         });
         return;
@@ -316,10 +317,10 @@ module.exports = function (v1, v2) {
         v1.setTimeout(() => {
           if (v58) v19 = true;
           v11 = Date.now() + v2.utils.getPacketBuffer();
-          v1.send(...v2.packet.get_all("S_GRANT_SKILL"), {
+          v1.send(...pk("S_GRANT_SKILL"), {
             skill: v66 ? v2.skills.getChargeSkillId(v61, v67) : v61
           });
-          v14 = [...v2.packet.get_all(v51), v52];
+          v14 = [...pk(v51), v52];
           if (v66) v12 = true;
         }, v66 ? 25 : 0);
         if (!v66) return;
@@ -366,7 +367,7 @@ module.exports = function (v1, v2) {
           break;
         } else v2.log.debug("RETRY", "retry not allowed through " + v80, v79);
         v7 = true;
-        v1.send(...v2.packet.get_all(v51), v52);
+        v1.send(...pk(v51), v52);
         v7 = false;
       }
     },
@@ -393,14 +394,14 @@ module.exports = function (v1, v2) {
       if (v88 > 100 && v86.failed) {
         v2.log.debug("SKILL_UPDATE", "Delay is too large and it failed. Block: " + v88);
         if (v2.auto) v2.auto.hit("reject");
-        v1.send(...v2.packet.get_all("S_CANNOT_START_SKILL"), {
+        v1.send(...pk("S_CANNOT_START_SKILL"), {
           skill: v83.skill
         });
         return false;
       }
       if (v6.counter && v13 === v17(v82, v83)) {
         v2.log.debug("SKILL_UPDATE", "Due to same packet as last, blocking");
-        v1.send(...v2.packet.get_all("S_CANNOT_START_SKILL"), {
+        v1.send(...pk("S_CANNOT_START_SKILL"), {
           skill: v83.skill
         });
         return false;
@@ -439,7 +440,7 @@ module.exports = function (v1, v2) {
       return false;
     },
     v22 = (v93, v94, v95) => {
-      v1.hook(...v2.packet.get_all(v93), v94, (...v97) => {
+      v1.hook(...pk(v93), v94, (...v97) => {
         return v95(v93, ...v97);
       });
     };
@@ -450,7 +451,7 @@ module.exports = function (v1, v2) {
   v22("C_START_INSTANCE_SKILL_EX", hooks.MODIFY_ALL, v21);
   v22("C_PRESS_SKILL", hooks.MODIFY_ALL, v21);
   v22("C_NOTIMELINE_SKILL", hooks.MODIFY_ALL, v21);
-  v1.hook(...v2.packet.get_all("C_CANCEL_SKILL"), hooks.MODIFY_REAL, v98 => {
+  v1.hook(...pk("C_CANCEL_SKILL"), hooks.MODIFY_REAL, v98 => {
     if (!v2.utils.isEnabled(v98.skill.id)) return;
     const v100 = v2?.action?.stage?.skill?.id;
     if (!v100) return;
@@ -460,11 +461,11 @@ module.exports = function (v1, v2) {
     v2.skills.sendActionEnd(v100, v102 ? 25 : v98.type);
     v5 = v98.type;
     v1.setTimeout(() => {
-      v1.send(...v2.packet.get_all("C_CANCEL_SKILL"), v98);
+      v1.send(...pk("C_CANCEL_SKILL"), v98);
     }, jit());
     return false;
   });
-  v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.MODIFY_REAL, v104 => {
+  v1.hook(...pk("S_ACTION_STAGE"), hooks.MODIFY_REAL, v104 => {
     if (!v2.player.isMe(v104.gameId)) return;
     if (!v2.utils.isEnabled()) return;
     if (!v2.utils.isEnabled(v104.skill.id)) {
@@ -481,10 +482,10 @@ module.exports = function (v1, v2) {
     }
     return false;
   });
-  v1.hook(...v2.packet.get_all("S_USER_STATUS"), hooks.READ_REAL, v106 => {
+  v1.hook(...pk("S_USER_STATUS"), hooks.READ_REAL, v106 => {
     if (!v2.player.inCombat && v106.status === 1) v16 = [];
   });
-  v1.hook(...v2.packet.get_all("S_ACTION_END"), hooks.MODIFY_REAL, v108 => {
+  v1.hook(...pk("S_ACTION_END"), hooks.MODIFY_REAL, v108 => {
     if (!v2.player.isMe(v108.gameId)) return;
     if (!v2.action.inAction) return;
     if (!v2.utils.isEnabled(v108.skill.id)) return;
@@ -503,13 +504,13 @@ module.exports = function (v1, v2) {
     }
     return false;
   });
-  v1.hook(...v2.packet.get_all("S_CONNECT_SKILL_ARROW"), hooks.MODIFY_REAL, v115 => {
+  v1.hook(...pk("S_CONNECT_SKILL_ARROW"), hooks.MODIFY_REAL, v115 => {
     if (v10 > Date.now()) return false;
   });
-  v1.hook(...v2.packet.get_all("S_GRANT_SKILL"), hooks.MODIFY_REAL, v117 => {
+  v1.hook(...pk("S_GRANT_SKILL"), hooks.MODIFY_REAL, v117 => {
     if (v11 > Date.now()) return false;
   });
-  v1.hook(...v2.packet.get_all("S_INSTANT_MOVE"), hooks.READ_REAL, v119 => {
+  v1.hook(...pk("S_INSTANT_MOVE"), hooks.READ_REAL, v119 => {
     if (!v2.player.isMe(v119.gameId)) return;
     const v121 = v2.last.instantMove._time || 0,
       v122 = Date.now() - v121 <= v2.utils.getPacketBuffer(250);
@@ -519,14 +520,14 @@ module.exports = function (v1, v2) {
     }
     v9 = v119.loc;
   });
-  v1.hook(...v2.packet.get_all("S_CREATURE_LIFE"), hooks.READ_DESTINATION_ALL, v124 => {
+  v1.hook(...pk("S_CREATURE_LIFE"), hooks.READ_DESTINATION_ALL, v124 => {
     if (!v2.player.isMe(v124.gameId)) return;
     if (v124.alive) return;
     if (!v2.utils.isEnabled()) return;
     if (!v2.action.inAction) return;
     v2.skills.sendActionEnd(v2.action.stage.skill.id, 699, v124.loc);
   });
-  v1.hook(...v2.packet.get_all("S_DEFEND_SUCCESS"), hooks.READ_DESTINATION_REAL, v126 => {
+  v1.hook(...pk("S_DEFEND_SUCCESS"), hooks.READ_DESTINATION_REAL, v126 => {
     if (!v2.player.isMe(v126.gameId)) return;
     const v128 = v2.utils.getSkillInfo(v2.last.startSkill.skill.id);
     if (v2.action.inAction && v2.utils.getSkillInfo(v2.action.stage.skill.id).skill === v128.skill) return;

@@ -1,8 +1,9 @@
 const hooks = require("../enums/hooks");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let v4 = [],
     v5 = 0;
-  v1.hook(...v2.packet.get_all("S_CAN_LOCKON_TARGET"), hooks.MODIFY_REAL, v8 => {
+  v1.hook(...pk("S_CAN_LOCKON_TARGET"), hooks.MODIFY_REAL, v8 => {
     if (!v2.utils.isEnabled(v8.skill.id)) return;
     return false;
   });
@@ -23,12 +24,12 @@ module.exports = function (v1, v2) {
         return;
       }
       v4.push(v16.target);
-      v1.send(...v2.packet.get_all("S_CAN_LOCKON_TARGET"), {
+      v1.send(...pk("S_CAN_LOCKON_TARGET"), {
         ...v16,
         success: true
       });
     };
-  v1.hook(...v2.packet.get_all("C_CAN_LOCKON_TARGET"), hooks.MODIFY_ALL, v18 => {
+  v1.hook(...pk("C_CAN_LOCKON_TARGET"), hooks.MODIFY_ALL, v18 => {
     if (!v2.utils.isEnabled(v18.skill.id)) return;
     if (v2.action.stage._time > v5) {
       v4 = [];
@@ -80,7 +81,7 @@ module.exports = function (v1, v2) {
         }
       }
     }
-    v1.send(...v2.packet.get_all("S_CAN_LOCKON_TARGET"), {
+    v1.send(...pk("S_CAN_LOCKON_TARGET"), {
       ...v18,
       success: false
     });

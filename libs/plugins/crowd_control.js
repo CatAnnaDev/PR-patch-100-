@@ -1,10 +1,11 @@
 const hooks = require("../enums/hooks");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let v4 = null,
     v5 = null,
     v6 = null,
     v7 = null;
-  v1.hook(...v2.packet.get_all("S_ACTION_END"), hooks.MODIFY_INTERNAL_REAL, v9 => {
+  v1.hook(...pk("S_ACTION_END"), hooks.MODIFY_INTERNAL_REAL, v9 => {
     if (v9.id === v7) {
       v2.log.debug("CC-ACTION-END", "Blocking because it's matching ids");
       return false;
@@ -21,7 +22,7 @@ module.exports = function (v1, v2) {
       }
     }
   });
-  v1.hook(...v2.packet.get_all("S_EACH_SKILL_RESULT"), hooks.MODIFY_ALL, v11 => {
+  v1.hook(...pk("S_EACH_SKILL_RESULT"), hooks.MODIFY_ALL, v11 => {
     if (!v11.reaction.enable) return;
     if (v2.player.isMe(v11.source)) return;
     if (!v2.player.isMe(v11.target)) return;
@@ -38,7 +39,7 @@ module.exports = function (v1, v2) {
       v5 = v1.setTimeout(() => {
         if (!v2.action.inAction) return v2.log.debug("CC - SESR", "not ending cc because we're not in an action");
         v2.log.debug("CC - SESR", "ending cc before server");
-        v1.send(...v2.packet.get_all("S_ACTION_END"), Object.assign({
+        v1.send(...pk("S_ACTION_END"), Object.assign({
           type: 0
         }, v16, {
           gameId: v2.player.gameId,
@@ -49,13 +50,13 @@ module.exports = function (v1, v2) {
       }, v13 - v2.ping.ping);
     }
     if (!v2.action.inAction) return;
-    v1.send(...v2.packet.get_all("S_ACTION_END"), Object.assign({
+    v1.send(...pk("S_ACTION_END"), Object.assign({
       type: 0
     }, v2.action.stage, {
       loc: v2.position.loc
     }));
   });
-  v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.READ_DESTINATION_ALL, v18 => {
+  v1.hook(...pk("S_ACTION_STAGE"), hooks.READ_DESTINATION_ALL, v18 => {
     if (!v2.player.isMe(v18.gameId)) return;
     if (v18.skill.type !== 2) return;
     if (v18.animSeq?.[0]?.duration !== 88888888) return;
@@ -69,7 +70,7 @@ module.exports = function (v1, v2) {
     v6 = v18.id;
     const v22 = v23 => {
       v4 = null;
-      v1.send(...v2.packet.get_all("S_ACTION_END"), Object.assign(v18, {
+      v1.send(...pk("S_ACTION_END"), Object.assign(v18, {
         loc: v2.position.loc
       }));
       v7 = v18.id;
@@ -96,7 +97,7 @@ module.exports = function (v1, v2) {
         case 232:
           {
             v2.log.debug("CC - 232", "ending skill because of fear");
-            v1.send(...v2.packet.get_all("S_ACTION_END"), Object.assign({
+            v1.send(...pk("S_ACTION_END"), Object.assign({
               type: 16
             }, v2.action.stage, {
               loc: v2.position.loc
@@ -106,6 +107,6 @@ module.exports = function (v1, v2) {
       }
     }
   };
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_BEGIN"), hooks.READ_DESTINATION_ALL, v8);
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_REFRESH"), hooks.READ_DESTINATION_ALL, v8);
+  v1.hook(...pk("S_ABNORMALITY_BEGIN"), hooks.READ_DESTINATION_ALL, v8);
+  v1.hook(...pk("S_ABNORMALITY_REFRESH"), hooks.READ_DESTINATION_ALL, v8);
 };

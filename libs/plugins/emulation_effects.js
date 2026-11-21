@@ -1,6 +1,7 @@
 const hooks = require("../enums/hooks"),
   classes = require("../enums/classes");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let v4 = 0,
     v5 = 0;
   v2.command.add("dash", v6 => {
@@ -11,14 +12,14 @@ module.exports = function (v1, v2) {
     v2.settings.dash = v6;
     v2.command.message("Dash delay has been set to " + v2.settings.dash + "ms from " + v8 + "ms");
   });
-  v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.READ_DESTINATION_ALL, v9 => {
+  v1.hook(...pk("S_ACTION_STAGE"), hooks.READ_DESTINATION_ALL, v9 => {
     if (!v2.player.isMe(v9.gameId)) return;
     if (!v2.utils.isEnabled(v9.skill.id)) return;
     if (["C_START_COMBO_INSTANT_SKILL", "C_START_INSTANCE_SKILL"].includes(v2.last.startSkill._name) && v9.stage === 0) {
       const v12 = v2.last.startSkill;
       if (v12?.targets?.length || v12?.endpoints?.length) v1.setTimeout(() => {
         if (!v2.action.inAction) return;
-        v1.send(...v2.packet.get_all("S_INSTANCE_ARROW"), {
+        v1.send(...pk("S_INSTANCE_ARROW"), {
           ...v2.last.startSkill,
           ...v9,
           actionId: v9.id
@@ -36,7 +37,7 @@ module.exports = function (v1, v2) {
             if (v2.action.stage.id !== v9.id) return;
             if (!v2.action.inAction) return;
             v4 = Date.now() + v2.utils.getPacketBuffer();
-            v1.send(...v2.packet.get_all("S_INSTANT_DASH"), {
+            v1.send(...pk("S_INSTANT_DASH"), {
               gameId: v9.gameId,
               target: v15,
               loc: v14.dest,
@@ -63,7 +64,7 @@ module.exports = function (v1, v2) {
             const v21 = v2.entity.getLocationForThisEntity(v18),
               v22 = v2.utils.getBossRadius(v18),
               v23 = v2.utils.applyDistance(v21, v21.w + Math.PI, v22);
-            v1.send(...v2.packet.get_all("S_INSTANT_MOVE"), {
+            v1.send(...pk("S_INSTANT_MOVE"), {
               gameId: v9.gameId,
               loc: v23,
               w: v21.w
@@ -104,7 +105,7 @@ module.exports = function (v1, v2) {
             if (v2.action.stage.id !== v9.id) return;
             if (!v2.action.inAction) return;
             v5 = Date.now() + v2.utils.getPacketBuffer();
-            v1.send(...v2.packet.get_all("S_INSTANT_MOVE"), {
+            v1.send(...pk("S_INSTANT_MOVE"), {
               gameId: v9.gameId,
               loc: v9.dest,
               w: v9.w
@@ -119,17 +120,17 @@ module.exports = function (v1, v2) {
         }
     }
   });
-  v1.hook(...v2.packet.get_all("S_INSTANT_MOVE"), hooks.MODIFY_REAL, v34 => {
+  v1.hook(...pk("S_INSTANT_MOVE"), hooks.MODIFY_REAL, v34 => {
     if (!v2.player.isMe(v34.gameId)) return;
     if (Date.now() > v5) return;
     return false;
   });
-  v1.hook(...v2.packet.get_all("S_INSTANT_DASH"), hooks.MODIFY_REAL, v36 => {
+  v1.hook(...pk("S_INSTANT_DASH"), hooks.MODIFY_REAL, v36 => {
     if (!v2.player.isMe(v36.gameId)) return;
     if (Date.now() > v4) return;
     return false;
   });
-  v1.hook(...v2.packet.get_all("S_INSTANCE_ARROW"), hooks.MODIFY_REAL, v38 => {
+  v1.hook(...pk("S_INSTANCE_ARROW"), hooks.MODIFY_REAL, v38 => {
     if (!v2.player.isMe(v38.gameId)) return;
     if (!v2.utils.isEnabled(v38.skill.id)) return;
     return false;

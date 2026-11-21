@@ -1,5 +1,9 @@
 const fs = require("fs"),
   nodePath = require("path");
+const PROFILE = {
+  on: false,
+  stats: Object.create(null)
+};
 class ModWrapper {
   constructor(mod) {
     this._mod = mod;
@@ -30,6 +34,26 @@ class ModWrapper {
     return this._mod.queryData(...args);
   };
   hook = (...args) => {
+    const last = args.length - 1,
+      cb = args[last];
+    if (typeof cb === "function" && typeof args[0] === "string") {
+      const name = args[0];
+      args[last] = function (a, b, c, d) {
+        if (!PROFILE.on) return cb(a, b, c, d);
+        const t0 = process.hrtime.bigint();
+        const r = cb(a, b, c, d);
+        const dt = Number(process.hrtime.bigint() - t0);
+        const s = PROFILE.stats[name] || (PROFILE.stats[name] = {
+          n: 0,
+          total: 0,
+          max: 0
+        });
+        s.n++;
+        s.total += dt;
+        if (dt > s.max) s.max = dt;
+        return r;
+      };
+    }
     const handle = this._mod.hook(...args);
     this._hooks.push(handle);
     return handle;
@@ -294,6 +318,7 @@ class PingRemover {
     }
   };
 }
+module.exports.profiler = PROFILE;
 module.exports.NetworkMod = PingRemover;
 module.exports.ClientMod = require("./libs/classes/datacenter");
 module.exports.RequireInterface = (_a, _b, mod) => mod;

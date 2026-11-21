@@ -1,6 +1,7 @@
 const classes = require("../enums/classes"),
   hooks = require("../enums/hooks");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let v4 = [];
   const v5 = v11 => (v12, v13) => {
       let v15 = null;
@@ -20,7 +21,7 @@ module.exports = function (v1, v2) {
         callback: (v18 = true) => {
           v1.clearTimeout(v16);
           v4.splice(v4.indexOf(v17), 1);
-          if (v18) v1.send(...v2.packet.get_all("S_PLAYER_STAT_UPDATE"), {
+          if (v18) v1.send(...pk("S_PLAYER_STAT_UPDATE"), {
             ...v2.player.previous_sPlayerStatUpdate,
             attackSpeedBonus: v2.player.attackSpeedBonus - v17.value
           });
@@ -28,7 +29,7 @@ module.exports = function (v1, v2) {
       };
       v4.push(v17);
       v16 = v1.setTimeout(v17.callback, v2.ping.ping);
-      v1.send(...v2.packet.get_all("S_PLAYER_STAT_UPDATE"), {
+      v1.send(...pk("S_PLAYER_STAT_UPDATE"), {
         ...v2.player.previous_sPlayerStatUpdate,
         attackSpeedBonus: v2.player.attackSpeedBonus + v17.value
       });
@@ -39,12 +40,12 @@ module.exports = function (v1, v2) {
         if (v23.abnormality === v21.id) v23.callback(false);
       }
     };
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_BEGIN"), hooks.READ_REAL, v6(false));
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_END"), hooks.READ_REAL, v6(true));
+  v1.hook(...pk("S_ABNORMALITY_BEGIN"), hooks.READ_REAL, v6(false));
+  v1.hook(...pk("S_ABNORMALITY_END"), hooks.READ_REAL, v6(true));
   const v7 = v24 => v25 => {
       for (const v27 of v25.bySkillCategory) {
         if (!v27) continue;
-        v1.send(...v2.packet.get_all("S_SKILL_CATEGORY"), {
+        v1.send(...pk("S_SKILL_CATEGORY"), {
           category: v27,
           enabled: v24
         });
@@ -87,9 +88,9 @@ module.exports = function (v1, v2) {
       }
       return v32;
     };
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_BEGIN"), hooks.READ_DESTINATION_FAKE, v10(v8));
-  v1.hook(...v2.packet.get_all("S_ABNORMALITY_END"), hooks.READ_DESTINATION_FAKE, v10(v9));
-  v1.hook(...v2.packet.get_all("S_PLAYER_STAT_UPDATE"), {
+  v1.hook(...pk("S_ABNORMALITY_BEGIN"), hooks.READ_DESTINATION_FAKE, v10(v8));
+  v1.hook(...pk("S_ABNORMALITY_END"), hooks.READ_DESTINATION_FAKE, v10(v9));
+  v1.hook(...pk("S_PLAYER_STAT_UPDATE"), {
     order: -1050
   }, v38 => {
     if (v4.length) v2.log.debug("STAT-UPDATE", "<-R attackSpeed:" + v38.attackSpeed + " attackSpeedBonus:" + v38.attackSpeedBonus);

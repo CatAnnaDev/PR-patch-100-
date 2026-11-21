@@ -1,6 +1,7 @@
 const hooks = require("../enums/hooks"),
   classes = require("../enums/classes");
 module.exports = function (v1, v2) {
+  const _pk = Object.create(null), pk = n => _pk[n] || (_pk[n] = v2.packet.get_all(n));
   let v4 = null;
   const v5 = v8 => {
     if (!v2.utils.isEnabled(v8.skill.id)) return;
@@ -11,12 +12,12 @@ module.exports = function (v1, v2) {
     if (v8.nextStackCooldown < 0) v8.nextStackCooldown = 0;
     return true;
   };
-  v1.hook(...v2.packet.get_all("S_DECREASE_COOLTIME_SKILL"), hooks.MODIFY_REAL, v5);
-  v1.hook(...v2.packet.get_all("S_START_COOLTIME_SKILL"), hooks.MODIFY_REAL, v5);
-  v1.hook(...v2.packet.get_all("S_CREST_MESSAGE"), hooks.READ_ALL, v11 => {
+  v1.hook(...pk("S_DECREASE_COOLTIME_SKILL"), hooks.MODIFY_REAL, v5);
+  v1.hook(...pk("S_START_COOLTIME_SKILL"), hooks.MODIFY_REAL, v5);
+  v1.hook(...pk("S_CREST_MESSAGE"), hooks.READ_ALL, v11 => {
     if (v11.type !== 6) return;
     if (!v2.utils.isEnabled()) return;
-    if (v2.cooldown.isOnCooldown(v11.skill)) v1.send(...v2.packet.get_all("S_DECREASE_COOLTIME_SKILL"), {
+    if (v2.cooldown.isOnCooldown(v11.skill)) v1.send(...pk("S_DECREASE_COOLTIME_SKILL"), {
       skill: v11.skill,
       cooldown: 0
     });
@@ -42,7 +43,7 @@ module.exports = function (v1, v2) {
       if (!v2.effects.getAbnormality(300805)) return false;
       return true;
     };
-  v1.hook(...v2.packet.get_all("S_ACTION_STAGE"), hooks.READ_DESTINATION_FAKE, v25 => {
+  v1.hook(...pk("S_ACTION_STAGE"), hooks.READ_DESTINATION_FAKE, v25 => {
     if (!v2.player.isMe(v25.gameId)) return;
     if (v25.stage) return;
     if (!v2.utils.isEnabled()) return;
@@ -61,7 +62,7 @@ module.exports = function (v1, v2) {
       if (v2.skills.getType(v30.id) === "movingDefence") return;
       const v32 = v6(v30.id);
       for (const v35 of v32) {
-        v1.send(...v2.packet.get_all("S_START_COOLTIME_SKILL"), {
+        v1.send(...pk("S_START_COOLTIME_SKILL"), {
           skill: v35,
           cooldown: v27.cooltime
         });
@@ -81,7 +82,7 @@ module.exports = function (v1, v2) {
         const v41 = v2.cooldown.getData(v30.skill, true);
         if (v41?.cooldown !== 0 && v41?.time > v28) return;
         for (const v42 of v32) {
-          v1.send(...v2.packet.get_all("S_DECREASE_COOLTIME_SKILL"), {
+          v1.send(...pk("S_DECREASE_COOLTIME_SKILL"), {
             skill: v42,
             cooldown: 0
           });
