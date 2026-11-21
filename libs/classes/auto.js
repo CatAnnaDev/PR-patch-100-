@@ -62,8 +62,7 @@ class AutoTune {
     if (this.pressure >= cfg.maxMs * cfg.sustainFrac) {
       if (!this.saturatedSince) this.saturatedSince = now;
       if (now - this.saturatedSince >= cfg.sustainMs) {
-        this.floor = Math.min(cfg.floorMax, this.floor + cfg.floorStep);
-        this.saturatedSince = now;
+        this.floor = Math.min(cfg.floorMax, this.floor + dt * (cfg.floorStep / Math.max(1, cfg.sustainMs)));
       }
     } else {
       this.saturatedSince = 0;

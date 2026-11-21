@@ -31,7 +31,7 @@ class Settings {
         sustainMs: 1500,
         sustainFrac: 0.7,
         notify: 0,
-        autoInstant: true,
+        autoInstant: false,
         fallbackFrac: 0.8,
         restoreFloor: 2,
         stallGapMs: 250,
