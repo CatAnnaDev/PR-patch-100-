@@ -71,7 +71,8 @@ module.exports = function (v1, v2) {
     const safety = v2.auto ? v2.auto.safetyMs() : 0;
     if (!v2.settings.info.instant) return v2.ping.jitter + safety;
     samplePing();
-    return Math.min(SPIKE_CAP(), Math.round(spikeHold + jitterPad())) + safety;
+    const pad = v2.settings.info.auto?.enabled ? jitterPad() : 0;
+    return Math.min(SPIKE_CAP(), Math.round(spikeHold + pad)) + safety;
   };
   let v4 = null,
     v5 = null,

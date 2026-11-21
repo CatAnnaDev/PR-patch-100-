@@ -24,7 +24,7 @@
     "minAlpha": 0.15
   },
   "auto": {
-    "enabled": true,
+    "enabled": false,
     "maxMs": 50,
     "floorMax": 40,
     "recoveryPerMs": 0.08,
@@ -39,7 +39,7 @@
       "reject": 0,
       "desync": 18
     },
-    "autoInstant": true,
+    "autoInstant": false,
     "fallbackFrac": 0.8,
     "restoreFloor": 2,
     "stallGapMs": 250,

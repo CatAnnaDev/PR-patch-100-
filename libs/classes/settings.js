@@ -30,7 +30,7 @@ class Settings {
         minAlpha: 0.15
       },
       auto: {
-        enabled: true,
+        enabled: false,
         maxMs: 50,
         floorMax: 40,
         recoveryPerMs: 0.08,
