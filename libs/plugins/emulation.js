@@ -255,6 +255,11 @@ module.exports = function (v1, v2) {
         v2.log.debug("EMULATION", "newSkillData changed value:", v59);
         if (v59.failed !== v53.failed && (v59.time || 0) < 0) {
           v2.log.debug("EMULATION", "Cancelling skill execution due to time being in the future");
+          v2.log.ghost("v20_future_time_cancel", {
+            skill: v52.skill?.id,
+            time: v59.time,
+            ping: v2.ping.ping
+          });
           v1.send(...pk("S_CANNOT_START_SKILL"), {
             skill: v52.skill
           });
@@ -289,6 +294,11 @@ module.exports = function (v1, v2) {
         return;
       }
       if (v60 < -4) {
+        v2.log.ghost("v20_cannot_cast", {
+          skill: v52.skill?.id,
+          cast: v60,
+          ping: v2.ping.ping
+        });
         v1.send(...pk("S_CANNOT_START_SKILL"), {
           skill: v52.skill
         });
@@ -393,6 +403,12 @@ module.exports = function (v1, v2) {
       if (v88 < 0) v88 = 0;
       if (v88 > 100 && v86.failed) {
         v2.log.debug("SKILL_UPDATE", "Delay is too large and it failed. Block: " + v88);
+        v2.log.ghost("v21_delay_too_large", {
+          skill: v83.skill?.id,
+          delay: v88,
+          ping: v2.ping.ping,
+          jitter: v2.ping.jitter
+        });
         if (v2.auto) v2.auto.hit("reject");
         v1.send(...pk("S_CANNOT_START_SKILL"), {
           skill: v83.skill
@@ -401,6 +417,10 @@ module.exports = function (v1, v2) {
       }
       if (v6.counter && v13 === v17(v82, v83)) {
         v2.log.debug("SKILL_UPDATE", "Due to same packet as last, blocking");
+        v2.log.ghost("v21_dup_packet", {
+          skill: v83.skill?.id,
+          ping: v2.ping.ping
+        });
         v1.send(...pk("S_CANNOT_START_SKILL"), {
           skill: v83.skill
         });
